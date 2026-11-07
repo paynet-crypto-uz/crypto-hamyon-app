@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Crypto Hamyon</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+  :root{
+    --green:#1FAE56;
+    --green-dark:#178a44;
+    --green-soft:#E7F7ED;
+    --bg:#FFFFFF;
+    --text:#111417;
+    --muted:#8A9099;
+    --border:#F0F1F3;
+    --radius:18px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0F1115;
+      --text:#F5F6F7;
+      --muted:#8A9099;
+      --border:#1D2127;
+      --green-soft:#132B1E;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    overscroll-behavior:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .app{max-width:520px;margin:0 auto;padding:14px 16px 32px;min-height:100vh;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:6px 0 18px;}
+  .topbar .back{
+    width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:var(--border);cursor:pointer;flex-shrink:0;
+  }
+  .topbar .back svg{width:18px;height:18px;}
+  .topbar h1{font-size:19px;font-weight:700;margin:0;flex:1;text-align:center;}
+  .topbar .spacer{width:38px;flex-shrink:0;}
+  .lang-switch{
+    display:flex;gap:4px;background:var(--border);border-radius:10px;padding:3px;
+  }
+  .lang-switch button{
+    border:none;background:transparent;color:var(--muted);font-size:12px;font-weight:700;
+    padding:5px 9px;border-radius:7px;cursor:pointer;
+  }
+  .lang-switch button.active{background:var(--green);color:#fff;}
+
+  .hello{color:var(--muted);font-size:14px;margin-bottom:2px;}
+  .balance-card{
+    background:var(--green-soft);border-radius:22px;padding:22px 20px;margin-bottom:18px;
+  }
+  .balance-card .label{color:var(--muted);font-size:13px;margin-bottom:6px;}
+  .balance-card .amount{font-size:34px;font-weight:800;}
+  .balance-card .amount span{color:var(--muted);font-weight:600;font-size:22px;}
+
+  .menu-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0 22px;}
+  .menu-item{
+    display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:none;border:none;
+    font-family:inherit;color:var(--text);
+  }
+  .menu-item img{width:46px;height:46px;}
+  .menu-item span{font-size:12.5px;font-weight:600;text-align:center;}
+
+  .promo{
+    background:var(--border);border-radius:20px;padding:18px;display:flex;justify-content:space-between;
+    align-items:center;gap:10px;margin-bottom:18px;
+  }
+  .promo .txt{font-size:14.5px;font-weight:600;line-height:1.3;max-width:220px;}
+  .promo .cta{
+    margin-top:10px;display:inline-flex;align-items:center;gap:4px;background:var(--green);color:#fff;
+    border-radius:999px;padding:9px 16px;font-size:13.5px;font-weight:700;width:fit-content;
+  }
+
+  .section-title{font-size:13px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin:14px 0 8px;}
+
+  .coin-row{
+    display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;margin-bottom:8px;
+    cursor:pointer;border:1px solid var(--border);
+  }
+  .coin-row:active{background:var(--border);}
+  .coin-icon{
+    width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:13px;flex-shrink:0;
+  }
+  .coin-info{flex:1;}
+  .coin-info .name{font-weight:700;font-size:15px;}
+  .coin-info .net{font-size:12.5px;color:var(--muted);}
+  .coin-row .chev{color:var(--muted);}
+
+  .field{
+    background:var(--border);border-radius:16px;padding:14px;margin-bottom:10px;
+  }
+  .field .flabel{font-size:12.5px;color:var(--muted);margin-bottom:4px;}
+  .field .fval{font-size:16px;font-weight:600;}
+  .field input{
+    width:100%;border:none;background:transparent;font-size:16px;font-weight:600;color:var(--text);
+    outline:none;font-family:inherit;
+  }
+
+  .notice{
+    display:flex;gap:10px;background:var(--border);border-radius:16px;padding:14px;font-size:13px;
+    color:var(--muted);line-height:1.4;margin:14px 0;
+  }
+  .notice .dot{
+    flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#3B82F6;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
+  }
+
+  .btn-primary{
+    width:100%;background:var(--green);color:#fff;border:none;border-radius:999px;padding:16px;
+    font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .btn-primary:disabled{background:#BFE6CE;cursor:not-allowed;}
+
+  .qr-wrap{display:flex;flex-direction:column;align-items:center;margin:20px 0 10px;}
+  .qr-box{
+    background:#fff;border-radius:20px;padding:16px;box-shadow:0 2px 14px rgba(0,0,0,.08);
+  }
+  .qr-box canvas{display:block;border-radius:8px;}
+  .qr-cap{color:var(--muted);font-size:13px;text-align:center;margin-top:12px;line-height:1.4;}
+
+  .addr-box{
+    background:var(--border);border-radius:16px;padding:14px;display:flex;align-items:center;
+    justify-content:space-between;gap:10px;margin-top:14px;
+  }
+  .addr-box .atxt{overflow:hidden;}
+  .addr-box .alabel{font-size:12.5px;color:var(--muted);margin-bottom:3px;}
+  .addr-box .aval{font-size:15px;font-weight:700;word-break:break-all;}
+  .addr-box .copy{flex-shrink:0;width:34px;height:34px;}
+
+  .screen{display:none;animation:fade .15s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);
+    padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;
+    transition:opacity .2s; z-index:50;
+  }
+  .toast.show{opacity:1;}
+
+  .powered{text-align:center;color:var(--muted);font-size:12px;margin-top:22px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ========== MAIN MENU ========== -->
+  <div class="screen active" id="screen-main">
+    <div class="topbar">
+      <div style="width:38px"></div>
+      <h1 data-i18n="appName">Crypto Hamyon</h1>
+      <div class="lang-switch">
+        <button id="lang-uz">UZ</button>
+        <button id="lang-ru">RU</button>
+      </div>
+    </div>
+
+    <div class="hello" id="hello-text" data-i18n="hello">Xush kelibsiz</div>
+    <div class="balance-card">
+      <div class="label" data-i18n="totalBalance">Umumiy balans</div>
+      <div class="amount">0.00 <span data-i18n="sum">so'm</span></div>
+    </div>
+
+    <div class="menu-grid">
+      <button class="menu-item" data-go="send">
+        <img src="icon_send.png" alt="" />
+        <span data-i18n="send">Jo'natish</span>
+      </button>
+      <button class="menu-item" data-go="buy">
+        <img src="icon_buy.png" alt="" />
+        <span data-i18n="buy">Sotib olish</span>
+      </button>
+      <button class="menu-item" data-go="sell">
+        <img src="icon_sell.png" alt="" />
+        <span data-i18n="sell">Sotish</span>
+      </button>
+      <button class="menu-item" data-go="receive">
+        <img src="icon_receive.png" alt="" />
+        <span data-i18n="receive">Qabul qilish</span>
+      </button>
+    </div>
+
+    <div class="promo">
+      <div>
+        <div class="txt" data-i18n="promoText">Karta bilan kripto-aktivlarni xarid qilish komissiyasi 1%</div>
+        <div class="cta" data-go="buy"><span data-i18n="topup">To'ldirish</span> &rarr;</div>
+      </div>
+    </div>
+
+    <div class="section-title" data-i18n="myAssets">Mening aktivlarim</div>
+    <div id="main-coin-list"></div>
+
+    <div class="powered">Crypto Hamyon</div>
+  </div>
+
+  <!-- ========== SEND ========== -->
+  <div class="screen" id="screen-send">
+    <div class="topbar">
+      <div class="back" data-back="main">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1 data-i18n="sendTitle">Jo'natish</h1>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="section-title" data-i18n="fromLabel">Qayerdan</div>
+    <div class="coin-row" data-pick="send-coin">
+      <div class="coin-icon" id="send-coin-icon" style="background:var(--border)">+</div>
+      <div class="coin-info">
+        <div class="name" id="send-coin-name" data-i18n="chooseAsset">Kripto-aktivni tanlang</div>
+        <div class="net" id="send-coin-net"></div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="section-title" data-i18n="toLabel">Qayerga</div>
+    <div class="field">
+      <div class="flabel" data-i18n="walletAddress">Kripto-hamyon manzili</div>
+      <input type="text" id="send-address" placeholder="0x... / T... / bc1..." />
+    </div>
+
+    <div class="field">
+      <div class="flabel" data-i18n="youSend">Siz jo'natyapsiz</div>
+      <input type="text" id="send-amount" placeholder="0.00" inputmode="decimal" />
+    </div>
+
+    <div class="notice">
+      <div class="dot">!</div>
+      <div data-i18n="sendWarning">O'tkazmani bekor qilib bo'lmaydi. Manzil va tarmoq to'g'ri tanlanganiga ishonch hosil qiling. Agar tarmoq mos kelmasa, kripto-aktivlar yo'qolishi mumkin.</div>
+    </div>
+
+    <button class="btn-primary" disabled data-i18n="continue">Davom etish</button>
+  </div>
+
+  <!-- ========== SELL ========== -->
+  <div class="screen" id="screen-sell">
+    <div class="topbar">
+      <div class="back" data-back="main">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1 data-i18n="sellTitle">Sotish</h1>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="coin-row" data-pick="sell-coin" style="margin-top:4px;">
+      <div class="coin-icon" style="background:var(--border)">+</div>
+      <div class="coin-info">
+        <div class="name" id="sell-coin-name" data-i18n="chooseAsset">Kripto-aktivni tanlang</div>
+        <div class="net" id="sell-coin-net"></div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="coin-row" id="sell-card-row">
+      <div class="coin-icon" style="background:var(--border)">+</div>
+      <div class="coin-info">
+        <div class="name" data-i18n="chooseCard">Kartani tanlang</div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <button class="btn-primary" disabled data-i18n="continue">Davom etish</button>
+  </div>
+
+  <!-- ========== BUY ========== -->
+  <div class="screen" id="screen-buy">
+    <div class="topbar">
+      <div class="back" data-back="main">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1 data-i18n="buyTitle">Kripto-aktivlarni sotib olish</h1>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="coin-row" id="buy-card-row" style="margin-top:4px;">
+      <div class="coin-icon" style="background:var(--green);color:#fff">CH</div>
+      <div class="coin-info">
+        <div class="name" data-i18n="myCard">Mening kartam</div>
+        <div class="net">0 so'm</div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="coin-row" data-pick="buy-coin">
+      <div class="coin-icon" style="background:var(--border)">+</div>
+      <div class="coin-info">
+        <div class="name" id="buy-coin-name" data-i18n="chooseAsset">Kripto-aktivni tanlang</div>
+        <div class="net" id="buy-coin-net"></div>
+      </div>
+      <div class="chev">›</div>
+    </div>
+
+    <div class="promo" style="margin-top:14px;">
+      <div class="txt" data-i18n="promoText">Karta bilan kripto-aktivlar xarid komissiyasi 1%</div>
+    </div>
+
+    <button class="btn-primary" disabled data-i18n="continue">Davom etish</button>
+  </div>
+
+  <!-- ========== RECEIVE: COIN LIST ========== -->
+  <div class="screen" id="screen-receive">
+    <div class="topbar">
+      <div class="back" data-back="main">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1 data-i18n="receiveTitle">Qabul qilish</h1>
+      <div class="spacer"></div>
+    </div>
+    <div class="section-title" data-i18n="selectAssetToReceive">Qabul qilmoqchi bo'lgan aktivni tanlang</div>
+    <div id="receive-coin-list"></div>
+  </div>
+
+  <!-- ========== RECEIVE: ADDRESS + QR ========== -->
+  <div class="screen" id="screen-address">
+    <div class="topbar">
+      <div class="back" data-back="receive">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1 data-i18n="addressTitle">Manzil</h1>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="section-title" data-i18n="toLabel">Qayerga</div>
+    <div class="coin-row" style="pointer-events:none;">
+      <div class="coin-icon" id="addr-coin-icon">?</div>
+      <div class="coin-info">
+        <div class="name" id="addr-coin-name">USDT</div>
+        <div class="net">0.00</div>
+      </div>
+    </div>
+
+    <div class="coin-row" style="pointer-events:none;margin-top:8px;">
+      <div class="coin-icon" style="background:var(--border);color:var(--text)">⛓</div>
+      <div class="coin-info">
+        <div class="flabel" data-i18n="networkLabel" style="font-size:12.5px;color:var(--muted);">To'plam</div>
+        <div class="name" id="addr-coin-network" style="font-size:15px;">Tron</div>
+      </div>
+    </div>
+
+    <div class="qr-wrap">
+      <div class="qr-box"><canvas id="qr-canvas"></canvas></div>
+      <div class="qr-cap" data-i18n="qrCaption">QR kodini skanerlang yoki manzildan nusxa oling</div>
+    </div>
+
+    <div class="addr-box">
+      <div class="atxt">
+        <div class="alabel" data-i18n="walletAddress">Kripto-hamyon manzili</div>
+        <div class="aval" id="addr-full-text">—</div>
+      </div>
+      <svg class="copy" id="copy-btn" viewBox="0 0 24 24" fill="none" style="cursor:pointer;">
+        <rect x="8" y="8" width="12" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M4 16V6a2 2 0 0 1 2-2h10" stroke="currentColor" stroke-width="1.8"/>
+      </svg>
+    </div>
+
+    <div class="notice">
+      <div class="dot">!</div>
+      <div data-i18n="receiveWarning">Qo'llab-quvvatlanadigan tarmoqni tekshiring. Agar kripto-aktivlarni boshqa tarmoq orqali qabul qilsangiz, ular yo'qolishi mumkin.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const tg = window.Telegram ? window.Telegram.WebApp : null;
+if (tg) { tg.ready(); tg.expand(); }
+
+/* ---------------- i18n ---------------- */
+const STR = {
+  uz: {
+    appName:"Crypto Hamyon", hello:"Xush kelibsiz", totalBalance:"Umumiy balans", sum:"so'm",
+    send:"Jo'natish", buy:"Sotib olish", sell:"Sotish", receive:"Qabul qilish",
+    promoText:"Karta bilan kripto-aktivlarni xarid qilish komissiyasi 1%", topup:"To'ldirish",
+    myAssets:"Mening aktivlarim",
+    sendTitle:"Jo'natish", fromLabel:"Qayerdan", toLabel:"Qayerga", chooseAsset:"Kripto-aktivni tanlang",
+    walletAddress:"Kripto-hamyon manzili", youSend:"Siz jo'natyapsiz", continue:"Davom etish",
+    sendWarning:"O'tkazmani bekor qilib bo'lmaydi. Manzil va tarmoq to'g'ri tanlanganiga ishonch hosil qiling. Agar tarmoq mos kelmasa, kripto-aktivlar yo'qolishi mumkin.",
+    sellTitle:"Sotish", chooseCard:"Kartani tanlang",
+    buyTitle:"Kripto-aktivlarni sotib olish", myCard:"Mening kartam",
+    receiveTitle:"Qabul qilish", selectAssetToReceive:"Qabul qilmoqchi bo'lgan aktivni tanlang",
+    addressTitle:"Manzil", networkLabel:"To'plam", qrCaption:"QR kodini skanerlang yoki manzildan nusxa oling",
+    receiveWarning:"Qo'llab-quvvatlanadigan tarmoqni tekshiring. Agar kripto-aktivlarni boshqa tarmoq orqali qabul qilsangiz, ular yo'qolishi mumkin.",
+    copied:"Nusxalandi"
+  },
+  ru: {
+    appName:"Crypto Hamyon", hello:"Добро пожаловать", totalBalance:"Общий баланс", sum:"сум",
+    send:"Отправить", buy:"Купить", sell:"Продать", receive:"Получить",
+    promoText:"Комиссия 1% при покупке криптоактивов картой", topup:"Пополнить",
+    myAssets:"Мои активы",
+    sendTitle:"Отправить", fromLabel:"Откуда", toLabel:"Куда", chooseAsset:"Выберите криптоактив",
+    walletAddress:"Адрес криптокошелька", youSend:"Вы отправляете", continue:"Продолжить",
+    sendWarning:"Перевод нельзя отменить. Убедитесь, что адрес и сеть выбраны правильно. Если сеть не совпадает, криптоактивы могут быть потеряны.",
+    sellTitle:"Продать", chooseCard:"Выберите карту",
+    buyTitle:"Купить криптоактивы", myCard:"Моя карта",
+    receiveTitle:"Получить", selectAssetToReceive:"Выберите актив, который хотите получить",
+    addressTitle:"Адрес", networkLabel:"Сеть", qrCaption:"Отсканируйте QR-код или скопируйте адрес",
+    receiveWarning:"Проверьте поддерживаемую сеть. Если вы получите криптоактивы через другую сеть, они могут быть потеряны.",
+    copied:"Скопировано"
+  }
+};
+
+let LANG = localStorage.getItem("ch_lang") || "uz";
+
+function applyLang(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const key = el.getAttribute("data-i18n");
+    if (STR[LANG][key]) el.textContent = STR[LANG][key];
+  });
+  document.getElementById("lang-uz").classList.toggle("active", LANG==="uz");
+  document.getElementById("lang-ru").classList.toggle("active", LANG==="ru");
+  document.documentElement.lang = LANG;
+  renderCoinLists();
+}
+document.getElementById("lang-uz").onclick = ()=>{ LANG="uz"; localStorage.setItem("ch_lang","uz"); applyLang(); };
+document.getElementById("lang-ru").onclick = ()=>{ LANG="ru"; localStorage.setItem("ch_lang","ru"); applyLang(); };
+
+/* ---------------- coins ---------------- */
+let COINS = [];
+fetch("assets.json").then(r=>r.json()).then(data=>{
+  COINS = data.coins;
+  renderCoinLists();
+}).catch(()=>{ COINS = []; });
+
+function coinIconEl(coin){
+  const div = document.createElement("div");
+  div.className = "coin-icon";
+  div.style.background = coin.color;
+  div.textContent = coin.symbol.slice(0,1);
+  return div;
+}
+
+function renderCoinLists(){
+  const mainList = document.getElementById("main-coin-list");
+  const recvList = document.getElementById("receive-coin-list");
+  if (!mainList || !COINS.length) return;
+  mainList.innerHTML = "";
+  recvList.innerHTML = "";
+  COINS.forEach(coin=>{
+    const row1 = buildCoinRow(coin, "0.00 "+STR[LANG].sum, "0.00 "+coin.symbol, ()=>{});
+    mainList.appendChild(row1);
+
+    const row2 = buildCoinRow(coin, coin.name, coin.network, ()=>openAddress(coin));
+    recvList.appendChild(row2);
+  });
+}
+
+function buildCoinRow(coin, line1, line2, onClick){
+  const row = document.createElement("div");
+  row.className = "coin-row";
+  const icon = coinIconEl(coin);
+  const info = document.createElement("div");
+  info.className = "coin-info";
+  info.innerHTML = `<div class="name">${line1}</div><div class="net">${line2}</div>`;
+  const chev = document.createElement("div");
+  chev.className = "chev";
+  chev.textContent = "›";
+  row.append(icon, info, chev);
+  row.onclick = onClick;
+  return row;
+}
+
+/* ---------------- navigation ---------------- */
+function go(screenId){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-"+screenId).classList.add("active");
+  if (tg) tg.BackButton[screenId==="main" ? "hide" : "show"]();
+}
+document.querySelectorAll("[data-go]").forEach(el=>{
+  el.addEventListener("click", ()=> go(el.getAttribute("data-go")));
+});
+document.querySelectorAll("[data-back]").forEach(el=>{
+  el.addEventListener("click", ()=> go(el.getAttribute("data-back")));
+});
+if (tg) tg.BackButton.onClick(()=> go("main"));
+
+/* simple pickers for send/sell/buy coin rows -> jump to receive-style list reused minimally */
+document.querySelectorAll("[data-pick]").forEach(el=>{
+  el.addEventListener("click", ()=>{
+    // lightweight inline picker using existing receive list screen
+    go("receive");
+    document.querySelectorAll("#receive-coin-list .coin-row").forEach((row,i)=>{
+      row.onclick = ()=>{
+        const coin = COINS[i];
+        const target = el.getAttribute("data-pick");
+        fillPicked(target, coin);
+        go(target.split("-")[0]);
+      };
+    });
+  });
+});
+
+function fillPicked(target, coin){
+  const prefix = target; // e.g. send-coin
+  const nameEl = document.getElementById(prefix+"-name");
+  const netEl = document.getElementById(prefix+"-net");
+  const iconEl = document.getElementById(prefix+"-icon");
+  if (nameEl) nameEl.textContent = coin.name;
+  if (netEl) netEl.textContent = coin.network;
+  if (iconEl){ iconEl.style.background = coin.color; iconEl.textContent = coin.symbol.slice(0,1); }
+}
+
+/* ---------------- receive -> address + QR ---------------- */
+function openAddress(coin){
+  document.getElementById("addr-coin-name").textContent = coin.name;
+  document.getElementById("addr-coin-network").textContent = coin.network;
+  document.getElementById("addr-coin-icon").style.background = coin.color;
+  document.getElementById("addr-coin-icon").textContent = coin.symbol.slice(0,1);
+  document.getElementById("addr-full-text").textContent = shortAddr(coin.address);
+  document.getElementById("addr-full-text").dataset.full = coin.address;
+
+  const canvas = document.getElementById("qr-canvas");
+  if (window.QRCode){
+    QRCode.toCanvas(canvas, coin.address, { width: 220, margin: 1, color:{ dark:"#111417", light:"#ffffff" } });
+  }
+  go("address");
+}
+
+function shortAddr(addr){
+  if (addr.length <= 18) return addr;
+  return addr.slice(0,8) + "......" + addr.slice(-8);
+}
+
+document.getElementById("copy-btn").addEventListener("click", ()=>{
+  const full = document.getElementById("addr-full-text").dataset.full || "";
+  navigator.clipboard.writeText(full).then(showCopied).catch(()=>{
+    const ta = document.createElement("textarea");
+    ta.value = full; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+    showCopied();
+  });
+});
+function showCopied(){
+  const t = document.getElementById("toast");
+  t.textContent = STR[LANG].copied;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1400);
+  if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+}
+
+/* greet with telegram name if available */
+if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user){
+  const u = tg.initDataUnsafe.user;
+  const helloEl = document.getElementById("hello-text");
+  if (helloEl) helloEl.textContent = (STR[LANG].hello) + ", " + (u.first_name || "");
+}
+
+applyLang();
+</script>
+</body>
+</html>

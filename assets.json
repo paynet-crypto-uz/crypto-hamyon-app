@@ -1,0 +1,14 @@
+{
+  "coins": [
+    { "id": "usdt_trc20", "symbol": "USDT", "network": "Tron (TRC20)", "name": "USDT", "address": "TDBfLuddYWNpHaceAtQxVY7nvrGA2GbDB9", "color": "#26A17B" },
+    { "id": "usdt_ton", "symbol": "USDT", "network": "TON", "name": "USDT (TON)", "address": "UQBAw9b0ugRipdq2VB5RE42TEy-Zm8AlT8hPsLskfKlgR8jG", "color": "#26A17B" },
+    { "id": "usdt_erc20", "symbol": "USDT", "network": "Ethereum (ERC20)", "name": "USDT (ERC20)", "address": "0xFD653939de14D19BC92928a81cc511BB83507Ea6", "color": "#26A17B" },
+    { "id": "btc", "symbol": "BTC", "network": "Bitcoin", "name": "Bitcoin", "address": "bc1qtl854yyz2rvdeta7hccnsmd5w5wk8ummlzrn6u", "color": "#F7931A" },
+    { "id": "xaut", "symbol": "XAUT", "network": "Ethereum (ERC20)", "name": "Tether Gold", "address": "0xFD653939de14D19BC92928a81cc511BB83507Ea6", "color": "#CBA135" },
+    { "id": "ton", "symbol": "TON", "network": "TON", "name": "Toncoin", "address": "UQBAw9b0ugRipdq2VB5RE42TEy-Zm8AlT8hPsLskfKlgR8jG", "color": "#0098EA" },
+    { "id": "sol", "symbol": "SOL", "network": "Solana", "name": "Solana", "address": "HUACsdcZ7s7he1R5mwk5DuirzqoyubpEukLGNpf58Y3x", "color": "#00FFA3" },
+    { "id": "bnb", "symbol": "BNB", "network": "BNB Smart Chain (BEP20)", "name": "Binance Coin", "address": "0xFD653939de14D19BC92928a81cc511BB83507Ea6", "color": "#F3BA2F" },
+    { "id": "xrp", "symbol": "XRP", "network": "Ripple", "name": "Ripple", "address": "rhoWVvdSYka77ox852bWSrdSN8vUvgbydP", "color": "#23292F" },
+    { "id": "trx", "symbol": "TRX", "network": "Tron", "name": "TRX", "address": "TDBfLuddYWNpHaceAtQxVY7nvrGA2GbDB9", "color": "#FF0013" }
+  ]
+}
